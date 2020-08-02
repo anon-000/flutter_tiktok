@@ -19,6 +19,7 @@ class FeedPlayerPortraitControls extends StatelessWidget {
   final FlickMultiManager flickMultiManager;
   final FlickManager flickManager;
 
+
   @override
   Widget build(BuildContext context) {
     FlickDisplayManager displayManager =
@@ -43,22 +44,47 @@ class FeedPlayerPortraitControls extends StatelessWidget {
 //              ),
 //            ),
 //          ),
-          Expanded(
-            child: FlickTogglePlayAction(
-              togglePlay: () {
-                flickMultiManager.togglePlay(flickManager);
-                displayManager.handleShowPlayerControls();
-              },
-              child: Center(child: FlickAutoHideChild(
-                autoHide: true,
-                showIfVideoNotInitialized: false,
-                child: FlickPlayToggle(
-                  playChild: Icon(Icons.play_arrow, size: 100, color: Colors.white.withOpacity(0.8),),
-                  pauseChild: Icon(Icons.pause, size: 100, color: Colors.white.withOpacity(0.7)),
+            Expanded(
+                child: GestureDetector(
+                  onTap: (){
+                    flickMultiManager.togglePlay(flickManager);
+                    displayManager.handleShowPlayerControls();
+                  },
+              child: Container(
+                child: Center(
+                child: AnimatedOpacity(
+                  opacity: flickManager.flickVideoManager.videoPlayerValue.isPlaying?0:1,
+                  duration: Duration(milliseconds: 300),
+                  child: FlickPlayToggle(
+                    playChild: Icon(
+                      Icons.play_arrow,
+                      size: 120,
+                      color: Colors.white.withOpacity(0.8),
+                    ),
+                    pauseChild: Icon(Icons.pause,
+                        size: 120, color: Colors.white.withOpacity(0.7)),
+                  ),
                 ),
-              )),
-            ),
-          ),
+              ),
+              ),
+            ))
+
+//          Expanded(
+//            child: FlickTogglePlayAction(
+//              togglePlay: () {
+//                flickMultiManager.togglePlay(flickManager);
+//                displayManager.handleShowPlayerControls();
+//              },
+//              child: Center(child: FlickAutoHideChild(
+//                autoHide: true,
+//                showIfVideoNotInitialized: false,
+//                child: FlickPlayToggle(
+//                  playChild: Icon(Icons.play_arrow, size: 100, color: Colors.white.withOpacity(0.8),),
+//                  pauseChild: Icon(Icons.pause, size: 100, color: Colors.white.withOpacity(0.7)),
+//                ),
+//              )),
+//            ),
+//          ),
 //          FlickAutoHideChild(
 //            autoHide: true,
 //            showIfVideoNotInitialized: false,

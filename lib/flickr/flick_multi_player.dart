@@ -38,7 +38,6 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
       autoPlay: false,
     );
     widget.flickMultiManager.init(flickManager);
-
     super.initState();
   }
 
