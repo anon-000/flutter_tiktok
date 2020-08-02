@@ -115,10 +115,12 @@ class _SideOptionsBarState extends State<SideOptionsBar> with TickerProviderStat
                 iconSize: 50,
                 onPressed: () {
                   onLikeTap();
-              widget.onLiked();
               setState(() {
                 isLiked = !isLiked;
               });
+              if(isLiked){
+                widget.onLiked();
+              }
                 }),
           ),
         ),

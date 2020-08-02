@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:alap/components/music_details_section.dart';
 import 'package:alap/components/side_options_bar.dart';
 import 'package:alap/data_models/video_data.dart';
@@ -47,6 +49,22 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvid
       });
     });
   }
+  void onLiked(double height, double width){
+    setState(() {
+      posx = width/2-15;
+      posy = height/2-10;
+      heartOpacity = 1;
+    });
+    _controller.forward().then((value){
+      _controller.reverse().then((value){
+        _controller.forward().whenComplete((){
+          setState(() {
+            heartOpacity = 0;
+          });
+        });
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -63,6 +81,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvid
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return GestureDetector(
       onTapDown: (TapDownDetails details)=>onTapDown(context, details),
       child: Stack(
@@ -83,9 +102,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvid
                   )
                   ),
                   child: AnimatedOpacity(
-                    duration: heartIn?Duration(milliseconds: 100):Duration(milliseconds: 400),
+                    duration: heartIn ? Duration(milliseconds: 100):Duration(milliseconds: 400),
                       opacity: heartOpacity,
-                      child: Icon(Icons.favorite,size: 90, color: Colors.red.withOpacity(0.8),)
+                      child: Transform.rotate(
+                        angle: posx > width/2+20 ? pi/6 : posx < width/2-20 ? -pi/6 : 0,
+                          child: Icon(Icons.favorite,size: 100, color: Colors.red.withOpacity(0.8),)
+                      )
                   )
               ),
           ),
@@ -95,6 +117,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvid
               child: SideOptionsBar(
                 onLiked: (){
                   print("Like Clicked");
+                  onLiked(height, width);
                 },
               )
           ),
