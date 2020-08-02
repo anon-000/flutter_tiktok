@@ -1,22 +1,28 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:alap/sub_components/comment_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 ///
 /// Created By AURO (aurosmruti@smarttersstudio.com) on 8/1/2020 12:14 AM
 ///
 
 class SideOptionsBar extends StatefulWidget {
+  final Function onLiked;
+  SideOptionsBar({this.onLiked});
   @override
   _SideOptionsBarState createState() => _SideOptionsBarState();
 }
 
-class _SideOptionsBarState extends State<SideOptionsBar> {
+class _SideOptionsBarState extends State<SideOptionsBar> with TickerProviderStateMixin{
 
+  AnimationController _controller;
   Timer _timer;
   double _start = 0;
   bool isLiked = false;
+  double likeAngle=0;
 
   void startTimer() {
     const oneSec = const Duration(milliseconds: 150);
@@ -30,14 +36,34 @@ class _SideOptionsBarState extends State<SideOptionsBar> {
     );
   }
 
+  onLikeTap(){
+    if(!isLiked){
+      Future.delayed(Duration(milliseconds: 500)).then((value){
+        setState(() {
+          likeAngle = -pi/6;
+        });
+      });
+      _controller.forward().then((value){
+        _controller.reverse();
+        setState(() {
+          likeAngle = 0;
+        });
+      });
+    }
+
+  }
+
   @override
   void initState() {
     super.initState();
     startTimer();
+    _controller = AnimationController(duration: const Duration(milliseconds: 700), vsync: this);
+//    _controller.repeat(reverse: true);
   }
   @override
   void dispose() {
     _timer.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -74,16 +100,34 @@ class _SideOptionsBarState extends State<SideOptionsBar> {
             )
           ],
         ),
-        IconButton(icon: Icon(Icons.favorite, color: isLiked?Colors.red:Colors.white,),
-            iconSize: 45,
-            onPressed: () {
-          setState(() {
-            isLiked = !isLiked;
-          });
-            }),
+        ScaleTransition(
+          scale: Tween(begin: 0.80, end: 1.3)
+              .animate(CurvedAnimation(
+              parent: _controller,
+              curve: Curves.elasticIn
+          )
+          ),
+          child: Transform.rotate(
+            angle: likeAngle,
+            origin: Offset(-5, 6),
+            child: IconButton(
+                icon: Icon(Icons.favorite, color: isLiked?Colors.red:Colors.white,),
+                iconSize: 50,
+                onPressed: () {
+                  onLikeTap();
+              widget.onLiked();
+              setState(() {
+                isLiked = !isLiked;
+              });
+                }),
+          ),
+        ),
         Text("771.1K", style: TextStyle(color: Colors.white),),
         IconButton(
-            icon: Icon(Icons.message_rounded, color: Colors.white), iconSize: 40, onPressed: () {}),
+            icon: Icon(Icons.message_rounded, color: Colors.white),
+            iconSize: 40, onPressed: () {
+              Get.bottomSheet(CommentSheet());
+        }),
         Text("4078",style: TextStyle(color: Colors.white)),
         IconButton(
             icon: Transform(

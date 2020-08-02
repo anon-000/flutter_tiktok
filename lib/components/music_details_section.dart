@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 ///
@@ -7,7 +9,56 @@ import 'package:flutter/material.dart';
 
 
 
-class MusicDetailsSection extends StatelessWidget {
+class MusicDetailsSection extends StatefulWidget {
+  final String name ;
+  MusicDetailsSection({this.name});
+
+  @override
+  _MusicDetailsSectionState createState() => _MusicDetailsSectionState();
+}
+
+class _MusicDetailsSectionState extends State<MusicDetailsSection> {
+  ScrollController scrollController;
+  bool isReverse = false;
+
+  Timer _timer;
+  String myString ='';
+
+  void animate() async{
+
+    if(scrollController.positions.isNotEmpty){
+      while(true) {
+
+        await scrollController.animateTo(
+            0.0, duration: new Duration(milliseconds: 400),
+            curve: Curves.ease);
+        setState(() {
+          isReverse = false;
+        });
+        await scrollController.animateTo(
+            scrollController.position.maxScrollExtent ,
+            duration: new Duration(seconds: 5), curve: Curves.linear).whenComplete((){
+          setState(() {
+            isReverse = true;
+          });
+        });
+      }
+    }else{
+      _timer = new Timer(const Duration(milliseconds: 400), () {
+        animate();
+      });
+    }
+
+  }
+
+  @override
+  void initState() {
+    scrollController = ScrollController();
+    super.initState();
+    myString = 'Original sound - '+ widget.name;
+    animate();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -27,7 +78,21 @@ class MusicDetailsSection extends StatelessWidget {
             children: [
               Icon(Icons.music_note, color: Colors.white),
               SizedBox(width: 15,),
-              Text("Original sound - Rangabati", style: TextStyle(color: Colors.white),)
+              Expanded(
+                child: SizedBox(
+                  height: 20,
+                  width: 90,
+                  child: ListView(
+                    controller: scrollController,
+                    shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        SizedBox(width: (myString.length*9).toDouble(),),
+                        isReverse?Text(""):Text("Original sound - "+ widget.name??'', style: TextStyle(color: Colors.white),),
+                        SizedBox(width: (myString.length*14).toDouble(),)
+                      ]),
+                ),
+              )
             ],
           )
         ],

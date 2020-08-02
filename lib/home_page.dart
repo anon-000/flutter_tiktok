@@ -3,8 +3,8 @@ import 'package:alap/bloc_models/video_bloc/index.dart';
 import 'package:alap/components/music_details_section.dart';
 import 'package:alap/components/nav_bar.dart';
 import 'package:alap/components/side_options_bar.dart';
+import 'package:alap/components/video_player_widget.dart';
 import 'package:alap/flickr/flick_multi_manager.dart';
-import 'package:alap/flickr/flick_multi_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
@@ -87,10 +87,9 @@ class _HomePageState extends State<HomePage> {
                                 ? CircularProgressIndicator()
                                 : Container()
                                 : Container(
-                              child: FlickMultiPlayer(
-                                url: VideoBloc().videos[index].video,
+                              child: VideoPlayerWidget(
                                 flickMultiManager: flickMultiManager,
-                                image: VideoBloc().videos[index].thumbnail,
+                                data: VideoBloc().videos[index],
                               ),
 //                    child: Center(child: Text(index.toString()),),
                             );
@@ -104,19 +103,9 @@ class _HomePageState extends State<HomePage> {
               ),
           )),
           Positioned(
-            bottom: 75,
-              right: 17,
-              child: SideOptionsBar()
-          ),
-          Positioned(
             width:width ,
               bottom:0,
               child: NavBar()
-          ),
-          Positioned(
-              width:width/1.3 ,
-              bottom:75,
-              child: MusicDetailsSection()
           ),
           Positioned(
             top: 50,
