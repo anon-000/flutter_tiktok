@@ -16,6 +16,7 @@ class _SideOptionsBarState extends State<SideOptionsBar> {
 
   Timer _timer;
   double _start = 0;
+  bool isLiked = false;
 
   void startTimer() {
     const oneSec = const Duration(milliseconds: 150);
@@ -73,7 +74,13 @@ class _SideOptionsBarState extends State<SideOptionsBar> {
             )
           ],
         ),
-        IconButton(icon: Icon(Icons.favorite, color: Colors.white,), iconSize: 45, onPressed: () {}),
+        IconButton(icon: Icon(Icons.favorite, color: isLiked?Colors.red:Colors.white,),
+            iconSize: 45,
+            onPressed: () {
+          setState(() {
+            isLiked = !isLiked;
+          });
+            }),
         Text("771.1K", style: TextStyle(color: Colors.white),),
         IconButton(
             icon: Icon(Icons.message_rounded, color: Colors.white), iconSize: 40, onPressed: () {}),

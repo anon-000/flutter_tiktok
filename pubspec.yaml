@@ -31,6 +31,10 @@ dependencies:
   flick_video_player: 0.1.1
   video_player: 0.10.11+2
   flutter_widgets: 0.1.12
+  flutter_bloc: ^5.0.1
+  dio: ^3.0.9
+  get: 3.4.1
+  shared_preferences: ^0.5.7+3
 
 dev_dependencies:
   flutter_test:

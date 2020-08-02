@@ -1,9 +1,12 @@
+import 'package:alap/bloc_models/base_state.dart';
+import 'package:alap/bloc_models/video_bloc/index.dart';
 import 'package:alap/components/music_details_section.dart';
 import 'package:alap/components/nav_bar.dart';
 import 'package:alap/components/side_options_bar.dart';
 import 'package:alap/flickr/flick_multi_manager.dart';
 import 'package:alap/flickr/flick_multi_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
 ///
@@ -16,26 +19,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<String> videoUrls = [
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_Babushan+movie+vdo/1596203065673_Babushan+movie+vdo.mp4',
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_fly+car/1596207704991_fly+car.mp4',
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_life+hack/1596207895680_life+hack.mp4',
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_surf+pi+scenee/1596208202166_surf+pi+scenee.mp4',
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_bombom+challenge/1596207557472_bombom+challenge.mp4'
-  ];
-  List<String> thumbUrls = [
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_Babushan+movie+vdo/1596203072142_vlcsnap-2020-07-31-19h12m43s788.jpg',
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_fly+car/1596207708555_vlcsnap-2020-07-31-20h31m09s554.jpg',
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_life+hack/1596207900844_vlcsnap-2020-07-31-20h34m26s034.jpg',
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_surf+pi+scenee/1596208207915_vlcsnap-2020-07-31-20h39m28s282.jpg',
-    'https://alap-video.s3.ap-south-1.amazonaws.com/video_bombom+challenge/1596207562934_vlcsnap-2020-07-31-20h28m05s057.jpg'
-  ];
   FlickMultiManager flickMultiManager;
 
   @override
   void initState() {
     flickMultiManager = FlickMultiManager();
     super.initState();
+    VideoBloc().add(LoadVideosEvent());
   }
 
   @override
@@ -59,19 +49,58 @@ class _HomePageState extends State<HomePage> {
               }
             },
                child: Container(
-                child: PageView.builder(
-                    itemCount: 5,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) => Container(
-                            child: ClipRRect(
+                child: BlocBuilder<VideoBloc, BaseState>(
+                    bloc: VideoBloc(),
+                    builder: (context, BaseState state){
+                      if(state is LoadingBaseState){
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if(state is EmptyBaseState){
+                        return Center(
+                          child: Text("No Videos Available"),
+                        );
+                      }
+                      if(state is ErrorBaseState){
+                        return Center(
+                          child: Text(state.errorMessage),
+                        );
+                      }
+                      if(state is VideoLoadedState){
+                        return PageView.builder(
+                          onPageChanged: (i){
+                            print("Page numberrrrrrrrrrrrrr  ::::::::::::::::::::"+i.toString());
+                            if( i == VideoBloc().videos.length-5){
+                              if(VideoBloc().videos.length - i <= 5)
+                                VideoBloc().add(LoadMoreVideosEvent());
+                            }
+                          },
+                          itemCount: VideoBloc().shouldVideoLoadMore
+                              ? VideoBloc().videos.length + 1
+                              : VideoBloc().videos.length,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, index){
+                            return index >
+                                VideoBloc().videos.length
+                                ? VideoBloc().shouldVideoLoadMore
+                                ? CircularProgressIndicator()
+                                : Container()
+                                : Container(
                               child: FlickMultiPlayer(
-                                url: videoUrls[index],
+                                url: VideoBloc().videos[index].video,
                                 flickMultiManager: flickMultiManager,
-                                image: thumbUrls[index],
+                                image: VideoBloc().videos[index].thumbnail,
                               ),
-                            ),
 //                    child: Center(child: Text(index.toString()),),
-                    )),
+                            );
+                          }
+                        );
+                    }
+                      return SizedBox(height: 0,
+                        width: width/2,);
+                    }
+                ),
               ),
           )),
           Positioned(
