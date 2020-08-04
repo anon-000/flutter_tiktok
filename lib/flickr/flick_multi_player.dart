@@ -16,12 +16,13 @@ import 'package:video_player/video_player.dart';
 
 class FlickMultiPlayer extends StatefulWidget {
   const FlickMultiPlayer(
-      {Key key, this.url, this.image, this.flickMultiManager})
+      {Key key, this.url, this.image, this.flickMultiManager, this.isPlaying})
       : super(key: key);
 
   final String url;
   final String image;
   final FlickMultiManager flickMultiManager;
+  final Function(bool result) isPlaying;
 
   @override
   _FlickMultiPlayerState createState() => _FlickMultiPlayerState();
@@ -40,7 +41,6 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
     widget.flickMultiManager.init(flickManager);
     super.initState();
   }
-
 
 
   @override
@@ -87,6 +87,10 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
               ),
             ),
             controls: FeedPlayerPortraitControls(
+              isPlaying: (result){
+                print("result from control :"+result.toString());
+                widget.isPlaying(result);
+              },
               flickMultiManager: widget.flickMultiManager,
               flickManager: flickManager,
             ),

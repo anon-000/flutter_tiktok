@@ -13,11 +13,12 @@ import 'package:provider/provider.dart';
 
 class FeedPlayerPortraitControls extends StatelessWidget {
   const FeedPlayerPortraitControls(
-      {Key key, this.flickMultiManager, this.flickManager})
+      {Key key, this.flickMultiManager, this.flickManager, this.isPlaying})
       : super(key: key);
 
   final FlickMultiManager flickMultiManager;
   final FlickManager flickManager;
+  final Function(bool playing) isPlaying;
 
 
   @override
@@ -45,29 +46,33 @@ class FeedPlayerPortraitControls extends StatelessWidget {
 //            ),
 //          ),
             Expanded(
-                child: GestureDetector(
-                  onTap: (){
-                    flickMultiManager.togglePlay(flickManager);
-                    displayManager.handleShowPlayerControls();
-                  },
-              child: Container(
-                child: Center(
-                child: AnimatedOpacity(
-                  opacity: flickManager.flickVideoManager.videoPlayerValue.isPlaying?0:1,
-                  duration: Duration(milliseconds: 300),
-                  child: FlickPlayToggle(
-                    playChild: Icon(
-                      Icons.play_arrow,
-                      size: 120,
-                      color: Colors.white.withOpacity(0.8),
+                child: Container(
+                  child: Center(
+                  child: AnimatedOpacity(
+                    opacity: flickManager.flickVideoManager.videoPlayerValue.isPlaying?0:1,
+                    duration: Duration(milliseconds: 300),
+                    child: FlickPlayToggle(
+                    togglePlay: (){
+                      print("toggle tap");
+                      flickMultiManager.togglePlay(flickManager);
+                      displayManager.handleShowPlayerControls();
+                      if(flickManager.flickVideoManager.isPlaying){
+                        isPlaying(true);
+                      }else{
+                        isPlaying(false);
+                      }
+                    },
+                      playChild: Icon(
+                        Icons.play_arrow,
+                        size: 120,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                      pauseChild: Icon(Icons.pause,
+                          size: 120, color: Colors.white.withOpacity(0.7)),
                     ),
-                    pauseChild: Icon(Icons.pause,
-                        size: 120, color: Colors.white.withOpacity(0.7)),
                   ),
                 ),
-              ),
-              ),
-            ))
+                ))
 
 //          Expanded(
 //            child: FlickTogglePlayAction(

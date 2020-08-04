@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:alap/components/music_details_section.dart';
@@ -5,6 +6,7 @@ import 'package:alap/components/side_options_bar.dart';
 import 'package:alap/data_models/video_data.dart';
 import 'package:alap/flickr/flick_multi_manager.dart';
 import 'package:alap/flickr/flick_multi_player.dart';
+import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///
@@ -25,13 +27,37 @@ class VideoPlayerWidget extends StatefulWidget {
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProviderStateMixin{
 
   AnimationController _controller;
+  AnimationController _heartOffsetController;
+  Animation<double> animation;
+  bool isPlaying=true;
   double posx = 100.0;
   double posy = 100.0;
+  Random random = Random();
   double heartOpacity = 0;
   bool heartIn = true;
+  double longPosX = 0;
+  double longPosY = 0;
+  int heartsLength = 1;
+  bool isMaxHeart = false;
+  Timer _timer;
+  double _start = 0;
+
+  void startTimer() {
+    const oneSec = const Duration(milliseconds: 250);
+    _timer = new Timer.periodic(
+      oneSec,
+          (Timer timer) => setState(
+            () {
+              heartsLength++;
+          _start = _start + 0.5;
+        },
+      ),
+    );
+  }
+
 
   void onTapDown(BuildContext context, TapDownDetails details) {
-    print('${details.globalPosition}');
+    print('On Tap Down : ${details.globalPosition}');
     final RenderBox box = context.findRenderObject();
     final Offset localOffset = box.globalToLocal(details.globalPosition);
     setState(() {
@@ -66,15 +92,46 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvid
     });
   }
 
+  onLongPressStart(BuildContext context, LongPressStartDetails details){
+    startTimer();
+    _heartOffsetController.reset();
+    setState(() {
+      isMaxHeart = true;
+    });
+
+    print('LongPress : ${details.globalPosition}');
+    final RenderBox box = context.findRenderObject();
+    final Offset localOffset = box.globalToLocal(details.globalPosition);
+    setState(() {
+      longPosX = localOffset.dx;
+      longPosY = localOffset.dy;
+    });
+    _heartOffsetController.forward().then((value){
+      setState(() {
+        isMaxHeart = false;
+      });
+    });
+
+  }
+
   @override
   void initState() {
     _controller = AnimationController(duration: const Duration(milliseconds: 700), vsync: this);
+    _heartOffsetController = AnimationController(vsync: this,duration: Duration(milliseconds: 300));
+    animation = Tween<double>(begin: 0.0, end: 150.0).animate(_heartOffsetController);
+
+    _heartOffsetController.addListener(() {
+      setState(() {
+
+      });
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _heartOffsetController.dispose();
     super.dispose();
   }
 
@@ -83,13 +140,26 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvid
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return GestureDetector(
+      onSecondaryTapDown: (TapDownDetails details)=>print("secondary tap up"),
+      onLongPressStart: (LongPressStartDetails details)=>onLongPressStart(context, details),
       onTapDown: (TapDownDetails details)=>onTapDown(context, details),
+      onLongPressEnd: (LongPressEndDetails d){
+        _timer.cancel();
+        setState(() {
+          heartsLength =1;
+        });
+      },
       child: Stack(
         children: [
           FlickMultiPlayer(
             url: widget.data.video,
             flickMultiManager: widget.flickMultiManager,
             image: widget.data.thumbnail,
+            isPlaying: (result){
+              setState(() {
+                isPlaying = result;
+              });
+            },
           ),
           Positioned(
             top: posy-35,
@@ -112,9 +182,24 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvid
               ),
           ),
           Positioned(
+            top: longPosY,
+            left: longPosX-10,
+            child: Column(
+              children: List.generate(heartsLength, (index) =>Transform.translate(
+                offset: Offset(0, -animation.value),
+                child: AnimatedOpacity(
+                  opacity: isMaxHeart ? 1 : 0,
+                  duration: Duration(milliseconds: 300),
+                    child: Icon(Icons.favorite, size: 50, color: Colors.teal,)
+                ),
+              )),
+            ),
+          ),
+          Positioned(
               bottom: 75,
               right: 17,
               child: SideOptionsBar(
+                isPlaying: isPlaying,
                 onLiked: (){
                   print("Like Clicked");
                   onLiked(height, width);

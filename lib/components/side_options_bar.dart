@@ -11,7 +11,8 @@ import 'package:get/get.dart';
 
 class SideOptionsBar extends StatefulWidget {
   final Function onLiked;
-  SideOptionsBar({this.onLiked});
+  final isPlaying;
+  SideOptionsBar({this.onLiked, this.isPlaying=false});
   @override
   _SideOptionsBarState createState() => _SideOptionsBarState();
 }
@@ -54,9 +55,24 @@ class _SideOptionsBarState extends State<SideOptionsBar> with TickerProviderStat
   }
 
   @override
+  void didUpdateWidget(SideOptionsBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPlaying != widget.isPlaying) {
+      if( widget.isPlaying){
+        startTimer();
+      }else{
+        _timer.cancel();
+      }
+    }
+
+  }
+
+  @override
   void initState() {
     super.initState();
-    startTimer();
+    if(widget.isPlaying){
+      startTimer();
+    }
     _controller = AnimationController(duration: const Duration(milliseconds: 700), vsync: this);
 //    _controller.repeat(reverse: true);
   }
