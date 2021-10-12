@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:alap/sub_components/comment_sheet.dart';
 import 'package:flutter/material.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:get/get.dart';
 
 ///
@@ -10,72 +11,74 @@ import 'package:get/get.dart';
 ///
 
 class SideOptionsBar extends StatefulWidget {
-  final Function onLiked;
+  final Function? onLiked;
   final isPlaying;
-  SideOptionsBar({this.onLiked, this.isPlaying=false});
+
+  SideOptionsBar({this.onLiked, this.isPlaying = false});
+
   @override
   _SideOptionsBarState createState() => _SideOptionsBarState();
 }
 
-class _SideOptionsBarState extends State<SideOptionsBar> with TickerProviderStateMixin{
-
-  AnimationController _controller;
-  Timer _timer;
+class _SideOptionsBarState extends State<SideOptionsBar>
+    with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Timer _timer;
   double _start = 0;
   bool isLiked = false;
-  double likeAngle=0;
+  double likeAngle = 0;
 
   void startTimer() {
     const oneSec = const Duration(milliseconds: 150);
     _timer = new Timer.periodic(
       oneSec,
-          (Timer timer) => setState(
-            () {
-              _start = _start + 0.5;
+      (Timer timer) => setState(
+        () {
+          _start = _start + 0.5;
         },
       ),
     );
   }
 
-  onLikeTap(){
-    if(!isLiked){
-      Future.delayed(Duration(milliseconds: 500)).then((value){
+  onLikeTap() {
+    if (!isLiked) {
+      Future.delayed(Duration(milliseconds: 500)).then((value) {
         setState(() {
-          likeAngle = -pi/6;
+          likeAngle = -pi / 6;
         });
       });
-      _controller.forward().then((value){
+      _controller.forward().then((value) {
         _controller.reverse();
         setState(() {
           likeAngle = 0;
         });
       });
     }
-
   }
 
   @override
   void didUpdateWidget(SideOptionsBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isPlaying != widget.isPlaying) {
-      if( widget.isPlaying){
+      if (widget.isPlaying) {
         startTimer();
-      }else{
+      } else {
         _timer.cancel();
       }
     }
-
   }
 
   @override
   void initState() {
     super.initState();
-    if(widget.isPlaying){
+    if (widget.isPlaying) {
       startTimer();
     }
-    _controller = AnimationController(duration: const Duration(milliseconds: 700), vsync: this);
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 700), vsync: this);
 //    _controller.repeat(reverse: true);
   }
+
   @override
   void dispose() {
     _timer.cancel();
@@ -109,54 +112,57 @@ class _SideOptionsBarState extends State<SideOptionsBar> with TickerProviderStat
               ),
             ),
             Positioned(
-              bottom: 3,
+                bottom: 3,
                 right: 0,
                 left: 0,
-                child: Icon(Icons.add_circle, color: Colors.red,)
-            )
+                child: Icon(
+                  Icons.add_circle,
+                  color: Colors.red,
+                ))
           ],
         ),
         ScaleTransition(
-          scale: Tween(begin: 0.80, end: 1.3)
-              .animate(CurvedAnimation(
-              parent: _controller,
-              curve: Curves.elasticIn
-          )
-          ),
+          scale: Tween(begin: 0.80, end: 1.3).animate(
+              CurvedAnimation(parent: _controller, curve: Curves.elasticIn)),
           child: Transform.rotate(
             angle: likeAngle,
             origin: Offset(-5, 6),
             child: IconButton(
-                icon: Icon(Icons.favorite, color: isLiked?Colors.red:Colors.white,),
+                icon: Icon(
+                  Icons.favorite,
+                  color: isLiked ? Colors.red : Colors.white,
+                ),
                 iconSize: 50,
                 onPressed: () {
                   onLikeTap();
-              setState(() {
-                isLiked = !isLiked;
-              });
-              if(isLiked){
-                widget.onLiked();
-              }
+                  setState(() {
+                    isLiked = !isLiked;
+                  });
+                  if (isLiked) {
+                    widget.onLiked!.call();
+                  }
                 }),
           ),
         ),
-        Text("771.1K", style: TextStyle(color: Colors.white),),
+        Text(
+          "771.1K",
+          style: TextStyle(color: Colors.white),
+        ),
         IconButton(
             icon: Icon(Icons.message_rounded, color: Colors.white),
-            iconSize: 40, onPressed: () {
+            iconSize: 40,
+            onPressed: () {
               Get.bottomSheet(CommentSheet());
-        }),
-        Text("4078",style: TextStyle(color: Colors.white)),
+            }),
+        Text("4078", style: TextStyle(color: Colors.white)),
         IconButton(
             icon: Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.rotationY(pi),
-                child: Icon(
-                  Icons.reply,color: Colors.white
-                )),
+                child: Icon(Icons.reply, color: Colors.white)),
             iconSize: 40,
             onPressed: () {}),
-        Text("1078",style: TextStyle(color: Colors.white, height: 1)),
+        Text("1078", style: TextStyle(color: Colors.white, height: 1)),
         SizedBox(
           height: 30,
         ),

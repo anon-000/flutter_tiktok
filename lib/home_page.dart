@@ -1,8 +1,6 @@
 import 'package:alap/bloc_models/base_state.dart';
 import 'package:alap/bloc_models/video_bloc/index.dart';
-import 'package:alap/components/music_details_section.dart';
 import 'package:alap/components/nav_bar.dart';
-import 'package:alap/components/side_options_bar.dart';
 import 'package:alap/components/video_player_widget.dart';
 import 'package:alap/flickr/flick_multi_manager.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +17,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  FlickMultiManager flickMultiManager;
+  late FlickMultiManager flickMultiManager;
 
   @override
   void initState() {

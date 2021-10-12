@@ -11,17 +11,17 @@ import 'package:flutter/material.dart';
 
 class MusicDetailsSection extends StatefulWidget {
   final String name ;
-  MusicDetailsSection({this.name});
+  MusicDetailsSection({this.name = ""});
 
   @override
   _MusicDetailsSectionState createState() => _MusicDetailsSectionState();
 }
 
 class _MusicDetailsSectionState extends State<MusicDetailsSection> {
-  ScrollController scrollController;
+  late ScrollController scrollController;
   bool isReverse = false;
 
-  Timer _timer;
+  Timer? _timer;
   String myString ='';
 
   void animate() async{
