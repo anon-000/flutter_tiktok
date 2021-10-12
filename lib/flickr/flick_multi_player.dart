@@ -5,31 +5,39 @@ import 'package:alap/flickr/portrait_controls.dart';
 ///
 ///
 
-
-
 import './flick_multi_manager.dart';
+
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flick_video_player/flick_video_player.dart';
 
 import 'package:flutter/material.dart';
+
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flutter_widgets/flutter_widgets.dart';
+
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:video_player/video_player.dart';
 
 class FlickMultiPlayer extends StatefulWidget {
   const FlickMultiPlayer(
-      {Key key, this.url, this.image, this.flickMultiManager, this.isPlaying})
+      {Key? key,
+      this.url = '',
+      this.image = '',
+      this.flickMultiManager,
+      this.isPlaying})
       : super(key: key);
 
   final String url;
   final String image;
-  final FlickMultiManager flickMultiManager;
-  final Function(bool result) isPlaying;
+  final FlickMultiManager? flickMultiManager;
+  final Function(bool result)? isPlaying;
 
   @override
   _FlickMultiPlayerState createState() => _FlickMultiPlayerState();
 }
 
 class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
-  FlickManager flickManager;
+  late FlickManager flickManager;
 
   @override
   void initState() {
@@ -38,14 +46,13 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
         ..setLooping(true),
       autoPlay: false,
     );
-    widget.flickMultiManager.init(flickManager);
+    widget.flickMultiManager!.init(flickManager);
     super.initState();
   }
 
-
   @override
   void dispose() {
-    widget.flickMultiManager.remove(flickManager);
+    widget.flickMultiManager!.remove(flickManager);
     super.dispose();
   }
 
@@ -55,7 +62,7 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
       key: ObjectKey(flickManager),
       onVisibilityChanged: (visiblityInfo) {
         if (visiblityInfo.visibleFraction > 0.9) {
-          widget.flickMultiManager.play(flickManager);
+          widget.flickMultiManager!.play(flickManager);
         }
       },
       child: Container(
@@ -87,20 +94,20 @@ class _FlickMultiPlayerState extends State<FlickMultiPlayer> {
               ),
             ),
             controls: FeedPlayerPortraitControls(
-              isPlaying: (result){
-                print("result from control :"+result.toString());
-                widget.isPlaying(result);
+              isPlaying: (result) {
+                print("result from control :" + result.toString());
+                widget.isPlaying!.call(result);
               },
-              flickMultiManager: widget.flickMultiManager,
+              flickMultiManager: widget.flickMultiManager!,
               flickManager: flickManager,
             ),
           ),
           flickVideoWithControlsFullscreen: FlickVideoWithControls(
             playerLoadingFallback: Center(
                 child: Image.network(
-                  widget.image,
-                  fit: BoxFit.fitWidth,
-                )),
+              widget.image,
+              fit: BoxFit.fitWidth,
+            )),
             controls: FlickLandscapeControls(),
             iconThemeData: IconThemeData(
               size: 40,

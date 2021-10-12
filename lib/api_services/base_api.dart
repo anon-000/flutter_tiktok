@@ -1,10 +1,11 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:alap/config/api_routes.dart';
 import 'package:alap/config/enums.dart';
 import 'package:alap/data_models/rest_error.dart';
 import 'package:alap/utils/utkal_snackbar.dart';
+
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:dio/dio.dart';
 
 ///
@@ -12,22 +13,19 @@ import 'package:dio/dio.dart';
 ///
 ///
 
-
-
-
 class ApiCall {
   static Future<Response> generalApiCall(
-      String path,
-      RequestMethod requestMethod, {
-        String id = '',
-        String basePath = ApiRoutes.baseUrl,
-        Map<String, String> query = const {},
-        Map<String, dynamic> body = const {},
-        bool isAuthNeeded = true,
-      }) async {
+    String path,
+    RequestMethod requestMethod, {
+    String id = '',
+    String basePath = ApiRoutes.baseUrl,
+    Map<String, String> query = const {},
+    Map<String, dynamic> body = const {},
+    bool isAuthNeeded = true,
+  }) async {
     final Dio dio = Dio();
     dio.options.contentType = 'application/json';
-    if (isAuthNeeded){}
+    if (isAuthNeeded) {}
 //      dio.options.headers['Authorization'] = SharedPreferenceHelper.accessToken;
     try {
       Response response;
@@ -45,7 +43,7 @@ class ApiCall {
           break;
         default:
           response =
-          await dio.delete('$basePath/$path/$id', queryParameters: query);
+              await dio.delete('$basePath/$path/$id', queryParameters: query);
           break;
       }
       print(response.toString());
@@ -53,9 +51,6 @@ class ApiCall {
     } on SocketException {
       throw 'No Internet Connection';
     } catch (error) {
-      if (error.response == null) {
-        throw 'No Internet Connection';
-      }
       if (error is DioError) {
         if (error.response.statusCode == 502) {
           print(error.response.statusMessage);
